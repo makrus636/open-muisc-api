@@ -4,7 +4,7 @@ const { AlbumPayloadSchema } = require('./schema');
 const AlbumsValidator = {
   validateAlbumPayload: (payload) => {
     const validationsResult = AlbumPayloadSchema.validate(payload);
-    if(validationsResult.error) {
+    if (validationsResult.error) {
       throw new InvariantError(validationsResult.error.message);
     }
   },

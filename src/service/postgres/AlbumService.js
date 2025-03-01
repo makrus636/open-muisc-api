@@ -14,7 +14,7 @@ class AlbumService {
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],
-    }
+    };
 
     const result = await this._pool.query(query);
 
@@ -38,14 +38,14 @@ class AlbumService {
     const songsQuery = {
       text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
       values: [id],
-    }
+    };
 
     const songsResult = await this._pool.query(songsQuery);
 
-    return { ...albumResult.rows[0], song: songsResult.rows};
+    return { ...albumResult.rows[0], songs: songsResult.rows };
   }
 
-  async editAlbumById(id, {name, year}){
+  async editAlbumById(id, { name, year }){
     const query = {
       text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
       values: [name, year, id],

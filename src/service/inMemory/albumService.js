@@ -12,14 +12,14 @@ class AlbumService {
     this._songService = songService;
   }
 
-  addAlbum({name, year}){
+  addAlbum({ name, year }){
     const id = `album-${nanoid(10)}`;
     const newAlbum = { id, name, year };
 
     this._albums.push(newAlbum);
 
     const isSucces = this._albums.some((album) => album.id === id);
-    if(!isSucces){
+    if (!isSucces){
       throw new InvariantError('Album gagal ditambahkan');
     }
     return id;
@@ -32,7 +32,7 @@ class AlbumService {
   getAlbumById(id) {
     const album = this._albums.find((al) => al.id === id);
 
-    if(!album){
+    if (!album){
       throw new NotFoundError('Album tidak ditemukan');
     }
     return album;
@@ -41,15 +41,15 @@ class AlbumService {
   editAlbumById(id, { name, year }){
     const index = this._albums.findIndex((al) => al.id === id);
 
-    if(index === -1){
+    if (index === -1){
       throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
     }
-    this._albums[index] = { ...this._albums[index], name, year};
+    this._albums[index] = { ...this._albums[index], name, year };
   }
-  
+
   deleteAlbumById(id){
     const index = this._albums.findIndex((al) => al.id === id);
-    if(index === -1){
+    if (index === -1){
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
 
@@ -59,7 +59,7 @@ class AlbumService {
   getAlbumDetailWithSongs(id){
     const album = this.getAlbumById(id);
 
-    if(!this._songService){
+    if (!this._songService){
       throw new Error('SongService belum diatur');
     }
 

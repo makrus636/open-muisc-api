@@ -1,7 +1,7 @@
 /**
  * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
  */
-exports.shorthands = undefined;
+
 
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
@@ -34,6 +34,7 @@ exports.up = (pgm) => {
       type: 'INTEGER',
       notNull: false,
     },
+    // eslint-disable-next-line camelcase
     album_id: {
       type: 'VARCHAR(50)',
       notNull: false,

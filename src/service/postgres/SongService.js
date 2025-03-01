@@ -14,8 +14,8 @@ class SongService {
     const id = `song-${nanoid(16)}`;
     const query = {
       text: 'INSERT INTO songs (id, title, year, genre, performer, duration, album_id) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-      values: [id, title, year, genre, performer, duration, albumId ],
-    }
+      values: [id, title, year, genre, performer, duration, albumId],
+    };
 
     const result = await this._pool.query(query);
 
@@ -26,26 +26,26 @@ class SongService {
     return result.rows[0].id;
   }
 
-  async getSongs({title, performer}) {
+  async getSongs({ title, performer }) {
     let query = 'SELECT id, title, performer FROM songs';
     const conditions = [];
     const values = [];
 
-    if(title) {
+    if (title) {
       conditions.push(
         `LOWER(title) LIKE LOWER($${conditions.length + 1})`,
       );
       values.push(`%${title}%`);
     }
 
-    if(performer) {
+    if (performer) {
       conditions.push(
         `LOWER(performer) LIKE LOWER($${conditions.length + 1})`,
       );
       values.push(`%${performer}%`);
     }
 
-    if(conditions.length > 0) {
+    if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(' AND ')}`;
     }
 
@@ -78,7 +78,7 @@ class SongService {
 
     const result = await this._pool.query(query);
 
-    if(!result.rows.length) {
+    if (!result.rows.length) {
       throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
     }
   }
@@ -91,7 +91,7 @@ class SongService {
 
     const result = await this._pool.query(query);
 
-    if(!result.rows.length) {
+    if (!result.rows.length) {
       throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
     }
   }

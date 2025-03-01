@@ -13,7 +13,7 @@ class SongService {
     this._songs.push(newSong);
 
     const isSucces = this._songs.some((song) => song.id === id);
-    if(!isSucces){
+    if (!isSucces){
       throw new InvariantError('Lagu gagal ditambahkan');
     }
 
@@ -25,12 +25,12 @@ class SongService {
 
     if (title) {
       const lowercasedTitle = title.toLowerCase();
-      songs = songs.filter((song) => song.title.toLowerCase().includes(lowercasedTitle));
+      songs = songs.filter((songs) => songs.title.toLowerCase().includes(lowercasedTitle));
     }
 
     if (performer) {
       const lowercasedPerformer = performer.toLowerCase();
-      songs = songs.filter((song) => song.performer.toLowerCase().includes(lowercasedPerformer));
+      songs = songs.filter((songs) => songs.performer.toLowerCase().includes(lowercasedPerformer));
     }
 
     return songs.map(({ id, title, performer }) => ({
@@ -39,24 +39,30 @@ class SongService {
   }
 
   getSongByAlbumId(albumId){
-    return this._songs.filter((songs) => songs.albumId === albumId).map(({ id, title, performer }) => {
-      id, title, performer
-    });
+    return this._songs.filter((songs) => songs.albumId === albumId).map(({
+      id,
+      title,
+      performer
+    }) => ({
+      id,
+      title,
+      performer,
+    }));
   }
 
   getSongById(id){
-    const song = this._songs.find((song) => song.id === id);
-    if(!song){
+    const songs = this._songs.find((songs) => songs.id === id);
+    if (!songs){
       throw new NotFoundError('Lagu tidak ditemukan');
     }
 
-    return song;
+    return songs;
   }
 
-  editSongById( id, { title, year, performer, genre, duration, albumId }){
+  editSongById(id, { title, year, performer, genre, duration, albumId }){
     const index = this._songs.findIndex((song) => song.id === id);
 
-    if(index === -1){
+    if (index === -1){
       throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
     }
 
@@ -66,11 +72,11 @@ class SongService {
 
   deleteSongById(id){
     const index = this._songs.findIndex((song) => song.id === id);
-    if(index === -1){
+    if (index === -1){
       throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
     }
 
-    this._songs.splice(index, 1);    
+    this._songs.splice(index, 1);
   }
 }
 
