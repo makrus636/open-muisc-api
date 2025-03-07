@@ -20,7 +20,7 @@ const AuthenticationsValidator = {
   },
   validateDeleteAuthenticationPayload: (payload) => {
     const validationResult = DeleteAuthenticationPayloadSchema.validate(payload);
-    if (!validationResult.error) {
+    if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
