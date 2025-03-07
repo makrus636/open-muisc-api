@@ -59,8 +59,6 @@ class PlaylistsServcie {
     };
 
     const result = await this._pool.query(query);
-    console.log(result.rows);
-    console.log(userId);
     if (!result.rows.length) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
@@ -73,17 +71,17 @@ class PlaylistsServcie {
   async verifyPlaylistAccess(playlistId, userId) {
     try {
       await this.verifyPlaylistOwner(playlistId, userId);
+      return;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
       }
-
-      try {
-        await this._collaborationService.verifyCollaborator(playlistId, userId);
-      // eslint-disable-next-line no-unused-vars
-      } catch (err) {
-        throw error;
-      }
+    }
+    try {
+      await this._collaborationService.verifyCollaborator(playlistId, userId);
+    // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
 

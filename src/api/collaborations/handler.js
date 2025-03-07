@@ -18,9 +18,6 @@ class CollaborationsHandler {
 
     const { id: credentialId } = request.auth.credentials;
     const { playlistId, userId } = request.payload;
-    console.log(credentialId);
-    console.log(playlistId);
-    console.log(userId);
 
     await this._usersService.verifyUserExist(userId);
     await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
