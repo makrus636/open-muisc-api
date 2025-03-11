@@ -1,5 +1,7 @@
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const path = require('path');
+const Inert = require('@hapi/inert');
 const ClientError = require('./exceptions/ClientError');
 const albums = require('./api/albums');
 const AlbumService = require('./service/postgres/AlbumService');
@@ -27,17 +29,31 @@ const collaborations = require('./api/collaborations');
 const CollaborationService = require('./service/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
 
+const _exports = require('./api/exports');
+const ProducerService = require('./service/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
+const uploads = require('./api/uploads');
+const StorageService = require('./service/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
+const CacheService = require('./service/redis/CacheService');
+
 require('dotenv').config();
 
 const init = async () => {
-  const albumService = new AlbumService();
+  const cacheService = new CacheService();
+  const albumsService = new AlbumService(cacheService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
-  const collaborationsService = new CollaborationService();
+  const collaborationsService = new CollaborationService(cacheService);
   const playlistsService = new PlaylistsService(collaborationsService);
   const playlistSongsService = new PlaylistSongsService();
   const playlistSongsActivitiesService = new PlaylistSongsActivitiesService();
+  const storageService = new StorageService(
+    path.resolve(__dirname, 'api/uploads/pictures'),
+  );
 
   const server = Hapi.Server({
     port: process.env.PORT,
@@ -53,6 +69,9 @@ const init = async () => {
     {
       plugin: Jwt,
     },
+    {
+      plugin: Inert,
+    }
   ]);
 
   server.auth.strategy('musicapp_jwt', 'jwt', {
@@ -75,8 +94,8 @@ const init = async () => {
     {
       plugin: albums,
       options: {
-        service: albumService,
-        validator: AlbumsValidator
+        service: albumsService,
+        validator: AlbumsValidator,
       },
     },
     {
@@ -136,6 +155,22 @@ const init = async () => {
         validator: CollaborationsValidator,
       },
     },
+    {
+      plugin: _exports,
+      options: {
+        ProducerService,
+        playlistsService,
+        validator: ExportsValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        service: storageService,
+        albumsService,
+        validator: UploadsValidator,
+      }
+    }
   ]);
 
   server.ext('onPreResponse', (request, h) => {
@@ -156,6 +191,11 @@ const init = async () => {
         return h.response(payload).code(401);
       case 404:
         return h.response(payload).code(404);
+      case 413:
+        return h.response({
+          status: 'fail',
+          message: 'Ukuran file terlalu besar',
+        }).code(413);
       default:
         console.log(response);
         return h.response({
