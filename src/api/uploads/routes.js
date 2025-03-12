@@ -19,7 +19,7 @@ const routes = (handler) => [
     path: '/uploads/{param*}',
     handler: {
       directory: {
-        path: path.resolve(__dirname, 'file'),
+        path: path.resolve(__dirname, ''),
         redirectToSlash: true,
       },
     },
